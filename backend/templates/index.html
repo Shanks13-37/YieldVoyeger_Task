@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/style.css">
+  <title>RAG Search</title>
+</head>
+<body>
+  <div class="container">
+    <h1>RAG SEARCH ENGINE</h1>
+    <form action="/ask" method="post">
+      <textarea name="question" placeholder="Ask something...">{{ question if question else "" }}</textarea>
+      <button type="submit">Ask</button>
+    </form>
+
+    {% if answer %}
+    <div class="answer">
+      <h3>Response:</h3>
+      <p>{{ answer }}</p>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>

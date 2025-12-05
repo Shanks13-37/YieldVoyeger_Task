@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build folders
+dist/
+.build/
+.dist/
+
+# Hugging Face cache (big files)
+.cache/
+*/.cache/
+hf_cache/
+*.bin
+*.safetensors
+*.h5
+*.pt
+
+# Local data that can be regenerated
+backend/embeddings/
+backend/documents/*.pdf
+backend/documents/*.csv
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
