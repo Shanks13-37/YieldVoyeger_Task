@@ -3,50 +3,74 @@ from pathlib import Path
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import faiss
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 topics = [
-    "Artificial intelligence", "Machine learning", "Deep learning", "Neural network",
-    "Transformer (machine learning model)", "Generative artificial intelligence",
-    "Large language model", "Natural language processing", "Computer vision",
-    "Reinforcement learning", "Supervised learning", "Unsupervised learning",
-    "Overfitting", "Algorithm", "Data structure", "Time complexity",
-    "Computational complexity theory", "Operating system", "Distributed computing",
-    "Parallel computing", "Quantum computing", "Blockchain", "Cryptocurrency",
-    "Cybersecurity", "Ethical hacking", "Public-key cryptography", "Cloud computing",
-    "Edge computing", "Internet of Things", "Big data", "Data mining",
-    "Database management system", "SQL", "NoSQL", "Computer architecture",
-    "Computer network", "Transmission Control Protocol", "Internet Protocol",
-    "Domain Name System", "Information security", "Software engineering",
-    "Systems engineering", "Version control", "Git",
 
-    "Space exploration", "Rocket", "Rocket propulsion", "Spaceflight", "Astronomy",
-    "Astrophysics", "Astrobiology", "NASA", "ISRO", "ESA (European Space Agency)",
-    "International Space Station", "Mars", "Moon", "Venus", "Jupiter",
-    "Black hole", "Big Bang", "Supernova", "Milky Way", "Andromeda Galaxy",
-    "Exoplanet", "Dark matter", "Dark energy", "Solar system",
-    "Cosmic microwave background", "Hubble Space Telescope",
-    "James Webb Space Telescope", "Gravitational wave", "Speed of light",
-    "Nuclear fusion", "SpaceX", "Starship (rocket)",
+    # General knowledge & life skills
+    "Human body", "Nutrition", "Mental health", "Exercise", "Sleep", "Stress management",
+    "Time management", "Productivity", "Goal setting", "Leadership", "Public speaking",
+    "Confidence building", "Communication skills", "Decision making", "Problem solving",
+    "Mindfulness", "Meditation", "Habits", "Motivation", "Happiness",
 
-    "DNA", "RNA", "Protein", "Photosynthesis", "Genetic engineering",
-    "Human brain", "Neuron", "Synapse", "Stem cell", "Evolution", "Natural selection",
-    "Ecology", "Enzyme", "Metabolism", "Amino acid", "Cell division",
-    "Mitochondrion", "Immune system", "Homeostasis", "Blood–brain barrier", "Psychology", "Cognitive science", "Chemistry",
-    "Organic chemistry", "Inorganic chemistry", "Periodic table",
-    "Chemical reaction", "Particle physics", "Quantum mechanics",
-    "Relativity", "Thermodynamics"
+    # Personal finance & business basics
+    "Saving money", "Budgeting", "Personal finance", "Credit score", "Loans",
+    "Investing for beginners", "Mutual funds", "Stock market basics", "Cryptocurrency basics",
+    "Real estate investing", "Financial planning", "Taxes", "Insurance", "Retirement planning",
+    "Entrepreneurship", "Startup basics", "Marketing", "Digital marketing",
+    "Branding", "Advertising", "Sales", "Customer service", "E-commerce", "Freelancing",
 
-    "Quantum mechanics", "General relativity", "Special relativity", "String theory",
-    "Quantum field theory", "Schrodinger equation", "Heisenberg uncertainty principle",
-    "Quantum tunneling", "Electron", "Proton", "Neutron", "Newton's laws of motion",
-    "Classical mechanics", "Electromagnetism", "Maxwell's equations", "Conservation of energy",
-    "Conservation of momentum", "Thermodynamics", "Entropy", "Kinetic theory of gases",
-    "Torque", "Angular momentum", "Simple harmonic motion", "Oscillation",
-    "Projectile motion", "Fluid dynamics", "Viscosity", "Friction", "Work and energy",
-    "Power (physics)", "Dark matter", "Dark energy", "Big Bang theory",
-    "Gravitational wave", "Neutron star", "Supernova", "Gamma-ray burst", "Observable universe", "Multiverse", "Nuclear physics", "Nuclear fusion", "Nuclear fission",
-    "Radioactivity", "Half-life (physics)", "Semiconductor"
+    # Technology (high-level, not scientific research)
+    "Artificial intelligence basics", "Machine learning basics", "Cybersecurity basics",
+    "Cloud computing basics", "Computer network basics", "Operating system basics",
+    "Internet of Things basics", "Smartphones", "Robotics basics", "Web development basics",
+    "Mobile apps", "Social media", "Virtual reality", "Augmented reality", "3D printing",
+    "Video editing", "Gaming industry", "Cryptocurrency overview", "Blockchain basics",
 
+    # History
+    "Ancient Egypt", "Indus Valley Civilization", "Mesopotamia", "Ancient Greece",
+    "Roman Empire", "Ottoman Empire", "Mughal Empire", "British Empire", "French Revolution",
+    "American Revolution", "Industrial Revolution", "World War I", "World War II",
+    "Cold War", "Renaissance", "Egyptian Pharaohs", "Vikings", "Medieval Europe",
+
+    # Countries & Geography
+    "India", "United States", "China", "Japan", "Russia", "United Kingdom",
+    "France", "Germany", "Spain", "Italy", "Australia", "Canada", "Brazil",
+    "Saudi Arabia", "South Africa", "Egypt", "Pakistan", "Sri Lanka", "Nepal",
+    "Tourism in India", "Famous world monuments", "Oceans of the world",
+    "Mountain ranges of the world", "Rivers of the world", "Deserts of the world",
+    "Islands of the world", "Himalayas", "Sahara Desert", "Amazon rainforest",
+
+    # Civics & Society
+    "Democracy", "Constitution", "Human rights", "Law and justice", "UN",
+    "European Union", "NATO", "World Health Organization", "International trade",
+    "Education system", "Healthcare system", "Globalization", "Immigration",
+
+    # Literature & Art
+    "Shakespeare", "Greek mythology", "Indian mythology", "Poetry", "Novels",
+    "Fiction", "Non-fiction", "Painting", "Sculpture", "Photography", "Architecture",
+    "History of cinema", "Animation", "Cartoons", "Graphic design",
+
+    # Entertainment
+    "Hollywood", "Bollywood", "Tollywood", "Anime", "K-pop",
+    "Netflix", "YouTube", "Video games", "Esports", "Music industry",
+    "Oscar awards", "Grammy awards", "Reality shows", "Sitcoms", "Action movies",
+
+    # Sports
+    "Cricket", "Football", "Basketball", "Tennis", "Badminton", "Table tennis",
+    "Volleyball", "Hockey", "Athletics", "Running", "Swimming", "Cycling",
+    "Chess", "Olympics", "Yoga", "Martial arts", "Gym workouts",
+
+    # Food & Culture
+    "Indian cuisine", "Chinese cuisine", "Italian cuisine", "Mexican cuisine",
+    "Continental cuisine", "Vegetarian diet", "Vegan diet", "Street food",
+    "Festivals of India", "Global festivals", "World religions", "Languages of the world",
+    "Wedding traditions", "Traditional clothing", "Cultural diversity",
+
+    # Travel & Lifestyle
+    "Travel tips", "Solo travel", "Backpacking", "Adventure tourism",
+    "Luxury travel", "Budget travel", "Work–life balance", "Minimalism",
+    "Interior design", "Fashion", "Skincare", "Haircare", "Fitness",
 ]
 
 dataset_text = ""
@@ -63,26 +87,23 @@ Path("documents").mkdir(exist_ok=True)
 Path("documents/corpus.txt").write_text(dataset_text, encoding="utf-8")
 print("\nSUCCESS — DATASET CREATED")
 
-def simple_chunk_text(text: str, max_chars: int=500):
-  paragraphs =[p.strip() for p in text.split("\n\n") if p.strip()]
-
-  chunks =[]
-  chunk_id = 0
-
-  for p in paragraphs:
-    wrapped = textwrap.wrap(p, max_chars)
-    for w in wrapped:
-      chunks.append({
-          "id": chunk_id,
-          "doc_id": "wiki_dataset",
-          "chunk_id": chunk_id,
-          "text" :w
-      })
-      chunk_id +=1
-  return chunks
-
 corpus_text_test = Path("documents/corpus.txt").read_text(encoding="utf-8")
-chunks = simple_chunk_text(corpus_text_test, max_chars=500)
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=50,
+    length_function=len
+)
+
+chunks_text = text_splitter.split_text(corpus_text_test)
+
+chunks = [
+    {"id": i, 
+     "doc_id": "wiki_dataset", 
+     "chunk_id": i, 
+     "text": chunk}
+    for i, chunk in enumerate(chunks_text)
+]
 
 Path("embeddings/chunks.json").write_text(json.dumps(chunks), encoding="utf-8")
 

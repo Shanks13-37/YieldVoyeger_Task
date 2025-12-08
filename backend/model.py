@@ -12,7 +12,7 @@ hf_model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 chunks = json.loads(open("embeddings/chunks.json", encoding="utf-8").read())
 index = faiss.read_index("embeddings/faiss.index")
 
-def retrieve_chunks(query, top_k =3):
+def retrieve_chunks(query, top_k =8):
   q_emb= embed_model.encode([query], convert_to_numpy=True).astype("float32")
   D, I =index.search(q_emb, top_k)
   retrieved = [chunks[i] for i in I[0]]
@@ -22,7 +22,13 @@ def generate_answer(question):
   retrieved_chunks = retrieve_chunks(question)
   context = "\n\n".join([c["text"] for c in retrieved_chunks])
 
-  prompt = f"You are a helpful AI assistant.Answer the question based ONLY on the context below.Give a detailed and complete explanation using multiple sentences. Use paragraphs, not a single long sentence.\n\nContext: \n{context}\n\nQuestion: {question}"
+  prompt = (
+    "You are a helpful AI assistant. Use ONLY the context below to answer. "
+    "If the context does not contain the answer, say: "
+    "'The context does not contain enough information to answer this question.'\n\n"
+    f"Context:\n{context}\n\n"
+    f"Question: {question}"
+)
 
   input = tokenizer(prompt, return_tensors="pt")
   outputs = hf_model.generate(**input, max_new_tokens=1000)
