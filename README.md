@@ -13,7 +13,7 @@ I used python to generate wikipedia summaries and stored it in corpus.txt.
 
 ## 2] Chunking the dataset:
 Large text is difficult for embedding models and LLMs to process directly.
-So I split the dataset into smaller pieces ("chunks") of ~500 characters which is perfect for FAISS.
+So I split the dataset into smaller pieces ("chunks") of ~500 characters and chunk overlap ~50, which is perfect for FAISS.
 Each chunk contains:
 -id
 -doc_id
@@ -22,11 +22,12 @@ Each chunk contains:
 
 ## 3]Embeddings:
 To enable similarity search, each chunk must be converted into a vector representation.
-I used: all-MiniLM-L6-v2 as it is fast, lightweight, free to use, high accuracy for FAISS and embedding dimension =384.
-This results in an embedding matrix of shape (num_chunks, 384)
+I used: all-MiniLM-L6-v2(Sentence transformer) as it is fast, lightweight, free to use, high accuracy for FAISS and embedding dimension =384.
+This results in an embedding matrix(numpy array) of shape (num_chunks, 384)
 
 ## 4] Vector Search using FAISS:
-FAISS is the engine that performs similarity search over the chunk embeddings.
+FAISS(Facebook AI Similarity Search) is the engine that performs similarity search over the chunk embeddings.
+Type: IndexFlatL2
 Steps:
 -Initialize a FAISS index using L2 distance
 -Add all embeddings to the index
@@ -36,7 +37,7 @@ Steps:
 I implemented retrieve_chunks(query, top_k=5) which:
 -Converts the user question into an embedding
 -Searches FAISS
--Returns the most relevant chunks
+-Returns the top k most relevant chunks
 These retrieved chunks become the “context” fed into the LLM.
 This is the Retrieval part of RAG.
 
